@@ -3,13 +3,20 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Constants } from 'expo';
 
-import Avatar from './components/Avatar.js';
+import Card from './components/Card';
 
 export default class App extends React.Component {
 	render() {
 		return (
 			<View style={styles.container}>
-				<Avatar initials={'FL'} size={35} backgroundColor={'teal'} />
+				<Card
+					fullname={'First Last'}
+					linkText={'Comments'}
+					onPressLinkText={() => {
+						console.log('Pressed link!');
+					}}
+					image={{ uri: 'https://unsplash.it/600/600' }}
+				/>
 			</View>
 		);
 	}
