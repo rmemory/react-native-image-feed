@@ -20,6 +20,10 @@ export default class Card extends React.Component {
 	state = {
 		loading: true,
 	};
+
+	shouldComponentUpdate(nextProps) {
+		return this.props.linkText !== nextProps.linkText
+	}
 	
 	handleLoad = () => {
 		this.setState({ loading: false });
