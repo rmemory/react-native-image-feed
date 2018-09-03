@@ -8,32 +8,44 @@ import Card from './Card';
 const keyExtractor = ({ id }) => id.toString();
 
 export default class CardList extends React.Component {
-	static propTypes = {
-		items: PropTypes.arrayOf(
-			PropTypes.shape({
-				id: PropTypes.number.isRequired,
-				author: PropTypes.string.isRequired,
-			}),
-		).isRequired,
-	};
+  static propTypes = {
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        author: PropTypes.string.isRequired,
+      }),
+    ).isRequired,
+    commentsForItem: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string))
+      .isRequired,
+    onPressComments: PropTypes.func.isRequired,
+  };
 
-	renderItem = ({ item: { id, author } }) => (
-		<Card
-			fullname={author}
-			image={{
-				uri: getImageFromId(id),
-			}}
-		/>
-	);
+  renderItem = ({ item: { id, author } }) => {
+    const { commentsForItem, onPressComments } = this.props;
+    const comments = commentsForItem[id];
 
-	render() {
-		const { items } = this.props;
-		return (
-			<FlatList
-				data={items}
-				renderItem={this.renderItem}
-				keyExtractor={keyExtractor}
-			/>
-		);
-	}
+    return (
+      <Card
+        fullname={author}
+        image={{
+          uri: getImageFromId(id),
+        }}
+        linkText={`${comments ? comments.length : 0} Comments`}
+        onPressLinkText={() => onPressComments(id)}
+      />
+    );
+  };
+
+  render() {
+    const { items, commentsForItem } = this.props;
+
+    return (
+      <FlatList
+        data={items}
+        extraData={commentsForItem}
+        renderItem={this.renderItem}
+        keyExtractor={keyExtractor}
+      />
+    );
+  }
 }
