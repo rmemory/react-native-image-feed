@@ -144,6 +144,19 @@ Common props include:
 • transparent - A bool determining whether the background of the modal is transparent.
 • visible - A bool determining whether the modal is visible or not.
 
+	<Modal
+		visible={showModal}
+		animationType="slide"
+		onRequestClose={this.closeCommentScreen}
+	>
+		<Comments
+			style={styles.container}
+			comments={commentsForItem[selectedItemId] || []}
+			onClose={this.closeCommentScreen}
+		// ...
+		/>
+	</Modal>
+
 # Nested destructuring
 
 This ...
