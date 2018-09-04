@@ -30,6 +30,16 @@ One minor inconvenience with both TouchableOpacity and TouchableHighlight : thes
 
 There are two ways to include images in an app: we can bundle an image asset with our code (which will then get stored on the device), or we can download an image from a URI.
 
+## URI loading
+
+static propTypes = {
+	image: Image.propTypes.source.isRequired,
+}
+
+	image={{
+		uri: getImageFromId(id),
+	}}
+
 ## Bundling Image Assets
 
 To bundle an image asset, we can require the image by name from our project directory just like any other file. The React Native packager will give us a reference to this image (a number) that represents the image’s metadata. The packager will automatically bundle images for multiple pixel densities if we name them with the @ suffix: .png for standard resolution, @2x.png for 2x resolution, and @3x.png for 3x resolution. We can pass an image reference to the source prop of an Image to render it.
@@ -75,9 +85,77 @@ We can use the aspectRatio style to render the image at a specific aspect ratio,
 
 While most commonly used with images, the aspectRatio style can be used on any component, such as View or Text.
 
+# ScrollView
+
+The ScrollView is simpler than the FlatList : it will render all of its children in a vertically or horizontally scrollable list, without the additional complexity of the keyExtractor or renderItem props.
+
+The ScrollView is well suited for scrolling through small quantities of content (fewer than 20 items or so). Content within a ScrollView is rendered even when it isn’t visible on the screen.
+
+Debug tip: If the ScrollView doesn’t appear, we need to add flex: 1 to each parent and to the ScrollView itself. To debug, you can try setting a background color on each parent to see where flex: 1 stopped getting propagated down the component hierarchy.
+
+renderItem = (item, index) => (
+	<View key={index} style={styles.comment}>
+		<Text>{item}</Text>
+	</View>
+);
+
+const { items } = this.props;
+return <ScrollView>{items.map(this.renderItem)}</ScrollView>;
+
 # FlatList
 
-FlatList components are used for rendering large quantities of scrollable content. Instead of rendering a children prop, the FlatList renders each item in an input data array using the renderItem prop. The renderItem prop is a function which takes an item from the data array and maps it to a React Element.
+FlatList components are used for rendering large quantities of scrollable content. Instead of rendering a children prop, the FlatList renders each item in an input data array using the renderItem prop (callback). The renderItem prop is a function which takes an item from the data array and maps it to a React Element. Also required is a keyExtractor prop (callback) which is passed an item from the data array, and is required to return a unique id for that item.
+
+const keyExtractor = ({ id }) => id.toString();
+
+static propTypes = {
+	items: PropTypes.arrayOf(
+		PropTypes.shape({
+			id: PropTypes.number.isRequired,
+			author: PropTypes.string.isRequired,
+		}),
+	).isRequired,
+};
+
+renderItem = ({ item: { id, author } }) => (
+	<Card
+		fullname={author}
+		image={{
+			uri: getImageFromId(id),
+		}}
+	/>
+);
+
+<FlatList
+	data={items}
+	renderItem={this.renderItem}
+	keyExtractor={keyExtractor}
+/>
+
+# Modal 
+
+The Modal component lets us transition to an entirely different screen. This is most useful for simple apps, since for complex apps you’ll likely be using a navigation library which will come with its own way of doing modals.
+
+Common props include:
+
+• animationType - This controls how the modal animates in and out. One of 'none' , 'slide' , or 'fade' (defaults to 'none' ).
+• onRequestClose - A function called when the user taps the Android back button.
+• onShow - A function called after the modal is fully visible.
+• transparent - A bool determining whether the background of the modal is transparent.
+• visible - A bool determining whether the modal is visible or not.
+
+# Nested destructuring
+
+This ...
+
+renderItem = ({ item: { id, author } }) => {}
+
+... is equivalent to:
+
+renderItem = (obj) => {
+	const id = obj.item.id;
+	const author = obj.item.author;
+}
 
 # Absolute vs relative posititioning
 
@@ -189,19 +267,10 @@ React Native uses the Yoga layout engine (also from Facebook). This is a cross-p
 • The default values are different
 • Yoga adds a couple new features that don’t exist in the browser (like aspectRatio )
 
-# Absolute file style
+# Screens
 
-It’s common to use position: 'absolute' to make elements overlap. Suppose we want two sibling elements to overlap, filling their parent completely. We can add a style like this to both siblings:
+screens are components just like any other. However, it’s useful to think about screens slightly differently. Screens are components that fill the entire device screen. They often handle non-visual concerns, like fetching data and handling navigation to other screens.
 
-const absoluteFillStyle = {
-	position: 'absolute',
-	top: 0,
-	right: 0,
-	bottom: 0,
-	left: 0,
-};
-
-This style will cause an element to fill its parent completely, since its top will match its parent’s top, its right side will match its parent’s right side, and so on. This technique is so common that there’s a predefined style to do the same thing: StyleSheet.absoluteFill .
 
 # Activity Indicator
 
